@@ -1,45 +1,48 @@
 import React from 'react';
-import { shallow } from 'enzyme';
 import CourseListRow from './CourseListRow';
+import { shallow } from 'enzyme';
+import { StyleSheetTestUtils } from 'aphrodite';
 
-describe('CourseListRow', () => {
-  describe('when isHeader is true', () => {
-    const wrapper = shallow(
-      <CourseListRow
-        isHeader={true}
-        textFirstCell="First Column"
-        textSecondCell=""
-      />
-    );
+beforeEach(() => {
+	StyleSheetTestUtils.suppressStyleInjection();
+});
+afterEach(() => {
+	StyleSheetTestUtils.clearBufferAndResumeStyleInjection();
+});
 
-    it('renders one cell with colspan = 2 when textSecondCell does not exist', () => {
-      expect(wrapper.find('td').length).toEqual(1);
-      expect(wrapper.find('td').props().colSpan).toEqual(2);
-      expect(wrapper.find('td').text()).toEqual('First Column');
-    });
+describe('Course List Row component test', () => {
+	it('should render without crashing', () => {
+		const wrapper = shallow(<CourseListRow textFirstCell='test' />);
 
-    it('renders two cells when textSecondCell is present', () => {
-      wrapper.setProps({ textSecondCell: "Second Column" });
-      expect(wrapper.find('td').length).toEqual(2);
-      expect(wrapper.find('td').at(0).text()).toEqual('First Column');
-      expect(wrapper.find('td').at(1).text()).toEqual('Second Column');
-    });
-  });
+		expect(wrapper.exists()).toBe(true);
+	});
 
-  describe('when isHeader is false', () => {
-    const wrapper = shallow(
-      <CourseListRow
-        isHeader={false}
-        textFirstCell="First Column"
-        textSecondCell="Second Column"
-      />
-    );
+	it('should render one cell with colspan = 2 when textSecondCell null', () => {
+		const wrapper = shallow(
+			<CourseListRow
+				isHeader={true}
+				textFirstCell='test'
+				textSecondCell={null}
+			/>
+		);
 
-    it('renders correctly two td elements within a tr element', () => {
-      expect(wrapper.find('tr').length).toEqual(1);
-      expect(wrapper.find('tr').find('td').length).toEqual(2);
-      expect(wrapper.find('tr').find('td').at(0).text()).toEqual('First Column');
-      expect(wrapper.find('tr').find('td').at(1).text()).toEqual('Second Column');
-    });
-  });
+		expect(wrapper.find('tr').children()).toHaveLength(1);
+		expect(wrapper.find('tr').childAt(0).html()).toEqual(
+			'<th style="background-color:#deb5b545" colSpan="2">test</th>'
+		);
+	});
+
+	it('should render two cells when textSecondCell not null', () => {
+		const wrapper = shallow(
+			<CourseListRow
+				isHeader={false}
+				textFirstCell='test'
+				textSecondCell='test'
+			/>
+		);
+
+		expect(wrapper.find('tr').children()).toHaveLength(2);
+		expect(wrapper.find('tr').childAt(0).html()).toEqual('<td>test</td>');
+		expect(wrapper.find('tr').childAt(1).html()).toEqual('<td>test</td>');
+	});
 });
